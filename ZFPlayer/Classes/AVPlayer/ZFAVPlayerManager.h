@@ -27,4 +27,6 @@
 
 @interface ZFAVPlayerManager : NSObject <ZFPlayerMediaPlayback>
 
+@property (nonatomic, copy) void(^presentationSizeAvailable)(NSObject <ZFPlayerMediaPlayback> *playback, CGSize size);
+
 @end

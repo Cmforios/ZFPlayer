@@ -66,7 +66,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor blackColor];
+        self.backgroundColor = [UIColor clearColor];
     }
     return self;
 }
@@ -78,6 +78,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
 
 - (void)setVideoGravity:(AVLayerVideoGravity)videoGravity {
     if (videoGravity == self.videoGravity) return;
+    [self avLayer].speed = 999;
     [self avLayer].videoGravity = videoGravity;
 }
 
@@ -256,7 +257,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
         _playerItem.canUseNetworkResourcesForLiveStreamingWhilePaused = NO;
     }
     if (@available(iOS 10.0, *)) {
-        _playerItem.preferredForwardBufferDuration = 1;
+        _playerItem.preferredForwardBufferDuration = 0.1;
         _player.automaticallyWaitsToMinimizeStalling = NO;
     }
     [self itemObserving];
@@ -344,7 +345,8 @@ static NSString *const kPresentationSize         = @"presentationSize";
     dispatch_async(dispatch_get_main_queue(), ^{
          if ([keyPath isEqualToString:kStatus]) {
              if (self.player.currentItem.status == AVPlayerItemStatusReadyToPlay) {
-                    self.loadState = ZFPlayerLoadStatePlaythroughOK;
+                 [self play];
+                 self.loadState = ZFPlayerLoadStatePlaythroughOK;
                  if (self.seekTime) {
                      [self seekToTime:self.seekTime completionHandler:nil];
                      self.seekTime = 0; // 滞空, 防止下次播放出错
@@ -378,6 +380,10 @@ static NSString *const kPresentationSize         = @"presentationSize";
              if (self.playerBufferTimeChanged) self.playerBufferTimeChanged(self, bufferTime);
          } else if ([keyPath isEqualToString:kPresentationSize]) {
              self->_presentationSize = self.playerItem.presentationSize;
+             
+             if (self.presentationSizeAvailable) {
+                 self.presentationSizeAvailable(self, self.presentationSize);
+             }
          } else {
              [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
          }
@@ -389,7 +395,8 @@ static NSString *const kPresentationSize         = @"presentationSize";
 - (UIView *)view {
     if (!_view) {
         _view = [[ZFPlayerPresentView alloc] init];
-        _view.backgroundColor = [UIColor blackColor];
+        _view.backgroundColor = [UIColor clearColor];
+        _view.userInteractionEnabled = NO;
     }
     return _view;
 }
