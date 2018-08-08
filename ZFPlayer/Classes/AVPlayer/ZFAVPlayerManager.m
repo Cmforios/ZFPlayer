@@ -95,7 +95,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
 }
 @property (nonatomic, strong, readonly) AVURLAsset *asset;
 @property (nonatomic, strong, readonly) AVPlayerItem *playerItem;
-@property (nonatomic, strong, readonly) AVPlayer *player;
+//@property (nonatomic, strong, readonly) AVPlayer *player;
 @property (nonatomic, strong) AVPlayerLayer *playerLayer;
 
 @end
@@ -124,6 +124,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
 @synthesize isPreparedToPlay               = _isPreparedToPlay;
 @synthesize scalingMode                    = _scalingMode;
 @synthesize playerPlayFailed               = _playerPlayFailed;
+@synthesize player                         = _player;
 
 - (instancetype)init {
     self = [super init];
@@ -243,16 +244,32 @@ static NSString *const kPresentationSize         = @"presentationSize";
     return 0;
 }
 
+- (void) startUsingAVPlayer: (AVPlayer *)avPlayer {
+    _player = avPlayer;
+    _asset = _player.currentItem.asset;
+    _playerItem = _player.currentItem;
+    
+    _isPreparedToPlay = YES;
+    [self initializePlayer];
+    self.loadState = ZFPlayerLoadStatePrepare;
+    if (_playerPrepareToPlay) _playerPrepareToPlay(self, self.assetURL);
+    [self play];
+}
+
 - (void)initializePlayer {
-    _asset = [AVURLAsset assetWithURL:self.assetURL];
-    _playerItem = [AVPlayerItem playerItemWithAsset:_asset automaticallyLoadedAssetKeys:@[@"duration"]];
-    _player = [AVPlayer playerWithPlayerItem:_playerItem];
-    _player.actionAtItemEnd = AVPlayerActionAtItemEndPause;
-    [self enableAudioTracks:YES inPlayerItem:_playerItem];
+    if (!_player) {
+        _asset = [AVURLAsset assetWithURL:self.assetURL];
+        _playerItem = [AVPlayerItem playerItemWithAsset:_asset automaticallyLoadedAssetKeys:@[@"duration"]];
+        _player = [AVPlayer playerWithPlayerItem:_playerItem];
+        _player.actionAtItemEnd = AVPlayerActionAtItemEndPause;
+    }
+    
+//    [self enableAudioTracks:YES inPlayerItem:_playerItem];
     
     ZFPlayerPresentView *presentView = (ZFPlayerPresentView *)self.view;
     presentView.player = _player;
     self.scalingMode = _scalingMode;
+    
     if (@available(iOS 9.0, *)) {
         _playerItem.canUseNetworkResourcesForLiveStreamingWhilePaused = NO;
     }
@@ -351,7 +368,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
                      [self seekToTime:self.seekTime completionHandler:nil];
                      self.seekTime = 0; // 滞空, 防止下次播放出错
                  }
-                 [self play];
+//                 [self play];
                  self.player.muted = self.muted;
                  /// Fix https://github.com/renzifeng/ZFPlayer/issues/475
                  self->_currentTime = CMTimeGetSeconds(self.playerItem.currentTime);
@@ -422,6 +439,7 @@ static NSString *const kPresentationSize         = @"presentationSize";
     _assetURL = assetURL;
     [self prepareToPlay];
 }
+
 
 - (void)setRate:(float)rate {
     _rate = rate;

@@ -29,4 +29,6 @@
 
 @property (nonatomic, copy) void(^presentationSizeAvailable)(NSObject <ZFPlayerMediaPlayback> *playback, CGSize size);
 
+- (void) startUsingAVPlayer: (AVPlayer *)avPlayer;
+
 @end

@@ -419,6 +419,11 @@
 
 #pragma mark - setter
 
+- (void) setAvPlayer:(AVPlayer *)avPlayer {
+    objc_setAssociatedObject(self, @selector(avPlayer), avPlayer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+//    self.currentPlayerManager.assetURL = assetURL;1
+}
+
 - (void)setAssetURL:(NSURL *)assetURL {
     objc_setAssociatedObject(self, @selector(assetURL), assetURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     self.currentPlayerManager.assetURL = assetURL;

@@ -23,6 +23,7 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 #import "ZFPlayerView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -100,6 +101,8 @@ typedef NS_ENUM(NSInteger, ZFPlayerScalingMode) {
 
 /// The play asset URL.
 @property (nonatomic) NSURL *assetURL;
+
+@property (nonatomic) AVPlayer *player;
 
 /// The video size.
 @property (nonatomic, readonly) CGSize presentationSize;

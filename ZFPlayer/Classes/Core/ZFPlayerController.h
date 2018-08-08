@@ -24,6 +24,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 #import "ZFPlayerMediaPlayback.h"
 #import "ZFOrientationObserver.h"
 #import "ZFPlayerMediaControl.h"
@@ -126,6 +127,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// if tableView or collectionView has only one section , use sectionAssetURLs.
 /// if normal model set this can use `playTheNext` `playThePrevious` `playTheIndex:`.
 @property (nonatomic, copy, nullable) NSArray <NSURL *>*assetURLs;
+
+@property (nonatomic, strong) AVPlayer *avPlayer;
 
 /// The currently playing index,limited to one-dimensional arrays.
 @property (nonatomic) NSInteger currentPlayIndex;
